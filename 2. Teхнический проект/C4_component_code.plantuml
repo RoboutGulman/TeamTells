@@ -19,7 +19,7 @@ Container_Boundary(message_processing_system, "Backend application"){
     Container(department_service, "DepartmentService", "Golang", "")
 }
 
-ContainerDb(company_database, "Company Database", "PostgreSQL", "Для хранения данных авторизации")
+ContainerDb(company_database, "Company Database", "PostgreSQL", "Для хранения данных")
 
 web_app --> api_gateway : "[HTTPS] Запросы к API gateway"
 
