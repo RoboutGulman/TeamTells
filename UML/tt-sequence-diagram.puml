@@ -1,0 +1,26 @@
+@startuml
+
+title HR Platform Sequence Diagram
+
+actor Administrator as Administrator
+
+participant "Frontend" as Frontend
+participant "Backend" as Backend
+
+
+group "Создание сотрудника"
+Administrator->Frontend: Заполнить данные сотрудника\n(ФИО, должность, фото)
+Frontend->Backend: Добавить данные сотрудника
+Frontend->Administrator: Сообщить о добавлении\n сотрудника
+end
+
+group "Создание департамента"
+Administrator->Frontend: Ввести данные департамента \n(Название, руководитель)
+Administrator->Frontend: Ввести данные сотрудников
+Backend->Frontend:Получить список сотрудников
+Administrator->Frontend:Выбрать сотрудников
+Frontend->Backend: Добавить данные департамента
+Frontend->Administrator: Сообщить о добавлении\n департамента
+end
+
+@enduml
