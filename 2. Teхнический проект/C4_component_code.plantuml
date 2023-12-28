@@ -1,0 +1,40 @@
+@startuml Component
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Component / Code
+
+Container(web_app, "Web application", "TypeScript and Angular", "")
+
+Container(api_gateway, "Api gateway", "nginx", "Кэширование запросов, аутентификация, мониторинг запросов, балансировка")
+
+Container_Boundary(message_processing_system, "Backend application"){
+    
+    Container(auth_handler, "AuthHandler", "Golang", "Авторизация, создание токена, проверка токена")
+    Container(auth_server, "AuthServer", "Golang")
+    Container(auth_service, "AuthService", "Golang", "")
+
+    Container(company_handler, "CompanyHandler", "Golang", "CRUD операции над сущностями: сотрудники, департаменты")
+    Container(company_server, "CompanyServer", "Golang")
+    Container(employee_service, "EmployeeService", "Golang", "")
+    Container(department_service, "DepartmentService", "Golang", "")
+}
+
+ContainerDb(company_database, "Company Database", "PostgreSQL", "Для хранения данных")
+
+web_app --> api_gateway : "[HTTPS] Запросы к API gateway"
+
+api_gateway --> auth_handler : "[REST] Запросы авторизации, проверки токена"
+
+auth_handler --> auth_server
+auth_server --> auth_service
+auth_service --> company_database
+
+api_gateway --> company_handler : "[REST] Запросы создания, редактирования, получения, удаления сотрудников или департаментов"
+
+company_handler --> company_server
+company_server --> employee_service
+company_server --> department_service
+department_service --> company_database
+employee_service --> company_database
+
+@enduml
