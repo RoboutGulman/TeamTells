@@ -1,0 +1,36 @@
+@startuml
+
+[*] --> HRPlatform : Start
+
+state HRPlatform {
+  state EmployeeCreation {
+    [*] --> employeeCreated : Создать сотрудника
+    state employeeCreated {
+      employeeCreated --> employeeEdit : Редактировать сотрудника
+      employeeEdit : Данные сотрудника обновлены
+      employeeEdit --> employeeMoved : Переместить сотрудника в другой отдел
+      employeeMoved : Сотрудник перемещен в другой отдел
+      employeeMoved --> employeeDeleted : Удалить сотрудника
+      employeeDeleted : Сотрудник удален из системы
+      employeeDeleted --> employeeCreated : Создать нового сотрудника
+    }
+  }
+  
+  state DepartmentCreation {
+    [*] --> departmentCreated : Создать департамент
+    state departmentCreated {
+      departmentCreated --> departmentEdit : Редактировать департамент
+      departmentEdit : Данные департамента обновлены
+      departmentEdit --> departmentEmployeeAdd : Добавить сотрудника в департамент
+      departmentEmployeeAdd : Сотрудник добавлен в новый департамент
+      departmentEmployeeAdd --> departmentEmployeeRemove : Удалить сотрудника из департамента
+      departmentEmployeeRemove : Удалить сотрудника из отдела
+      departmentEmployeeRemove --> departmentDeleted : Удалить департамент
+      departmentDeleted : Департамент удален
+      departmentDeleted --> departmentCreated : Создать новый департамент
+    }
+  }
+}
+
+
+@enduml
