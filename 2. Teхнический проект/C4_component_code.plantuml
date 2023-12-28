@@ -3,21 +3,52 @@
 
 title Component / Code
 
+skinparam rectangle<<boundary>> {
+    Shadowing false
+    StereotypeFontSize 0
+    FontColor #444444
+    BorderColor #444444
+    BorderStyle dashed
+    BackgroundColor #FFFFFF
+}
+
 Container(web_app, "Web application", "TypeScript and Angular", "")
 
 Container(api_gateway, "Api gateway", "nginx", "Кэширование запросов, аутентификация, мониторинг запросов, балансировка")
 
-Container_Boundary(message_processing_system, "Backend application"){
-    
-    Container(auth_handler, "AuthHandler", "Golang", "Авторизация, создание токена, проверка токена")
-    Container(auth_server, "AuthServer", "Golang")
-    Container(auth_service, "AuthService", "Golang", "")
 
-    Container(company_handler, "CompanyHandler", "Golang", "CRUD операции над сущностями: сотрудники, департаменты")
-    Container(company_server, "CompanyServer", "Golang")
-    Container(employee_service, "EmployeeService", "Golang", "")
-    Container(department_service, "DepartmentService", "Golang", "")
-}
+  rectangle "==Backend application" <<boundary>> as backend {
+
+    rectangle "==Authentication Module" <<boundary>> as authModule {
+        rectangle "==API Layer" <<boundary>> as authAPILayer {
+            Container(auth_handler, "AuthHandler", "Golang", "Обрабатывает Http запросы, извлекает параметры из них")
+        }
+        rectangle "==Application Layer" <<boundary>> as authApplicationLayer {
+            Container(auth_server, "AuthServer", "Golang", "Управление сервисами, возврат результатов запроса и ошибок")
+            Container(auth_service, "AuthService", "Golang", "CRUD операции над пользователем")
+            Container(token_service, "TokenService", "Golang", "CRUD операции над токенами")
+        }
+        rectangle "==Infrastructure Layer" <<boundary>> as authInfrastructureLayer {
+            Container(auth_repo, "AuthRepository", "Golang", "")
+            Container(token_repo, "TokenRepository", "Golang", "")
+        }
+    }
+    rectangle "==Company Module" <<boundary>> as companyModule {
+            rectangle "==API Layer" <<boundary>> as companyAPILayer {
+                Container(company_handler, "CompanyHandler", "Golang", "Обрабатывает Http запросы, извлекает параметры из них")
+            }
+            rectangle "==Application Layer" <<boundary>> as companyApplicationLayer {
+                Container(company_server, "CompanyServer", "Golang", "Управление сервисами, возврат результатов запроса и ошибок")
+                Container(employee_service, "EmployeeService", "Golang", "CRUD операции над сотрудником")
+                Container(department_service, "DepartmentService", "Golang", "CRUD операции над департаментом")
+            }
+            rectangle "==Infrastructure Layer" <<boundary>> as companyInfrastructureLayer {
+                Container(employee_repo, "EmployeeRepository", "Golang", "")
+                Container(department_repo, "DepartmentRepository", "Golang", "")
+            }
+    }
+
+    }
 
 ContainerDb(company_database, "Company Database", "PostgreSQL", "Для хранения данных")
 
@@ -27,14 +58,20 @@ api_gateway --> auth_handler : "[REST] Запросы авторизации, п
 
 auth_handler --> auth_server
 auth_server --> auth_service
-auth_service --> company_database
+auth_server --> token_service
+auth_service --> auth_repo
+auth_repo--> company_database
+token_service --> token_repo
+token_repo --> company_database
 
 api_gateway --> company_handler : "[REST] Запросы создания, редактирования, получения, удаления сотрудников или департаментов"
 
 company_handler --> company_server
 company_server --> employee_service
 company_server --> department_service
-department_service --> company_database
-employee_service --> company_database
+department_service --> department_repo
+department_repo--> company_database
+employee_service -->employee_repo
+employee_repo--> company_database
 
 @enduml
